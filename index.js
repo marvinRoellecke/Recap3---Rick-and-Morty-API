@@ -13,40 +13,53 @@ const nextButton = document.querySelector('[data-js="button-next"]');
 const pagination = document.querySelector('[data-js="pagination"]');
 
 // States
-const maxPage = 1;
+const dataCharacters = await fetchCharacters();
+const maxPage = dataCharacters.info.pages; //hier stand eine 1
 const page = 1;
 const searchQuery = "";
+let currentPage = 1;
 
-const dataCharacters = await fetchCharacters();
-dataCharacters.forEach((dataCharacter) => {
+dataCharacters.results.forEach((dataCharacter) => {
   cardContainer.append(createCharacterCard(dataCharacter));
 });
+
+pagination.textContent = `${currentPage} / ${maxPage}`;
 
 async function fetchCharacters(pageIndex) {
   const response = await fetch(
     "https://rickandmortyapi.com/api/character?page=" + pageIndex
   );
   const data = await response.json();
-
-  return data.results;
+  console.log(data);
+  return data; //.results
 }
 
 //Next und Previous Button
-let currentPage = 1;
+
 nextButton.addEventListener("click", async () => {
-  cardContainer.innerHTML = "";
-  currentPage++;
-  const dataCharacters = await fetchCharacters(currentPage);
-  dataCharacters.forEach((dataCharacter) => {
-    cardContainer.append(createCharacterCard(dataCharacter));
-  });
+  if (currentPage >= maxPage) {
+    return;
+  } else {
+    cardContainer.innerHTML = "";
+    currentPage++;
+    const dataCharacters = await fetchCharacters(currentPage);
+    dataCharacters.results.forEach((dataCharacter) => {
+      cardContainer.append(createCharacterCard(dataCharacter));
+    });
+    pagination.textContent = `${currentPage} / ${maxPage}`;
+  }
 });
 
 prevButton.addEventListener("click", async () => {
-  cardContainer.innerHTML = "";
-  currentPage--;
-  const dataCharacters = await fetchCharacters(currentPage);
-  dataCharacters.forEach((dataCharacter) => {
-    cardContainer.append(createCharacterCard(dataCharacter));
-  });
+  if (currentPage <= 1) {
+    return;
+  } else {
+    cardContainer.innerHTML = "";
+    currentPage--;
+    const dataCharacters = await fetchCharacters(currentPage);
+    dataCharacters.results.forEach((dataCharacter) => {
+      cardContainer.append(createCharacterCard(dataCharacter));
+    });
+    pagination.textContent = `${currentPage} / ${maxPage}`;
+  }
 });

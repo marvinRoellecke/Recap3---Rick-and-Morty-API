@@ -1,5 +1,7 @@
 import { createCharacterCard } from "./components/card/card.js";
 
+console.clear();
+
 const cardContainer = document.querySelector('[data-js="card-container"]');
 const searchBarContainer = document.querySelector(
   '[data-js="search-bar-container"]'
@@ -20,13 +22,31 @@ dataCharacters.forEach((dataCharacter) => {
   cardContainer.append(createCharacterCard(dataCharacter));
 });
 
-//console.log(dataCharacters);
-
-async function fetchCharacters() {
-  const response = await fetch("https://rickandmortyapi.com/api/character");
+async function fetchCharacters(pageIndex) {
+  const response = await fetch(
+    "https://rickandmortyapi.com/api/character?page=" + pageIndex
+  );
   const data = await response.json();
-  console.log(data.results);
+
   return data.results;
 }
 
-//console.log(fetchCharacters());
+//Next und Previous Button
+let currentPage = 1;
+nextButton.addEventListener("click", async () => {
+  cardContainer.innerHTML = "";
+  currentPage++;
+  const dataCharacters = await fetchCharacters(currentPage);
+  dataCharacters.forEach((dataCharacter) => {
+    cardContainer.append(createCharacterCard(dataCharacter));
+  });
+});
+
+prevButton.addEventListener("click", async () => {
+  cardContainer.innerHTML = "";
+  currentPage--;
+  const dataCharacters = await fetchCharacters(currentPage);
+  dataCharacters.forEach((dataCharacter) => {
+    cardContainer.append(createCharacterCard(dataCharacter));
+  });
+});

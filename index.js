@@ -26,12 +26,20 @@ dataCharacters.results.forEach((dataCharacter) => {
 pagination.textContent = `${currentPage} / ${maxPage}`;
 
 async function fetchCharacters(pageIndex) {
-  const response = await fetch(
-    "https://rickandmortyapi.com/api/character?page=" + pageIndex
-  );
-  const data = await response.json();
-  console.log(data);
-  return data; //.results
+  try {
+    const response = await fetch(
+      "https://rickandmortyapi.com/api/character?page=" + pageIndex
+    );
+    if (!response.ok) {
+      console.error("Response failed");
+    } else {
+      const data = await response.json();
+      console.log(data);
+      return data; //.results
+    }
+  } catch (error) {
+    console.error("ERROR: Your Rick and Morty API could not be loaded");
+  }
 }
 
 //Next und Previous Button

@@ -7,17 +7,18 @@ const searchBarContainer = document.querySelector(
   '[data-js="search-bar-container"]'
 );
 const searchBar = document.querySelector('[data-js="search-bar"]');
+const searchBarInput = document.querySelector('[data-js="search-bar__input"]');
 const navigation = document.querySelector('[data-js="navigation"]');
 const prevButton = document.querySelector('[data-js="button-prev"]');
 const nextButton = document.querySelector('[data-js="button-next"]');
 const pagination = document.querySelector('[data-js="pagination"]');
 
 // States
-const dataCharacters = await fetchCharacters();
-const maxPage = dataCharacters.info.pages; //hier stand eine 1
-const page = 1;
-const searchQuery = "";
+let searchQuery = "";
 let currentPage = 1;
+const dataCharacters = await fetchCharacters(currentPage, searchQuery);
+const maxPage = dataCharacters.info.pages; //hier stand eine 1
+//const page = 1;
 
 dataCharacters.results.forEach((dataCharacter) => {
   cardContainer.append(createCharacterCard(dataCharacter));
@@ -25,10 +26,13 @@ dataCharacters.results.forEach((dataCharacter) => {
 
 pagination.textContent = `${currentPage} / ${maxPage}`;
 
-async function fetchCharacters(pageIndex) {
+async function fetchCharacters(pageIndex, indexQuery) {
   try {
     const response = await fetch(
-      "https://rickandmortyapi.com/api/character?page=" + pageIndex
+      "https://rickandmortyapi.com/api/character?page=" +
+        pageIndex +
+        "&name=" +
+        indexQuery
     );
     if (!response.ok) {
       console.error("Response failed");
@@ -45,16 +49,16 @@ async function fetchCharacters(pageIndex) {
 //Next und Previous Button
 
 nextButton.addEventListener("click", async () => {
-  if (currentPage >= maxPage) {
+  if (currentPage > dataCharacters.info.pages) {
     return;
   } else {
     cardContainer.innerHTML = "";
     currentPage++;
-    const dataCharacters = await fetchCharacters(currentPage);
+    const dataCharacters = await fetchCharacters(currentPage, searchQuery);
     dataCharacters.results.forEach((dataCharacter) => {
       cardContainer.append(createCharacterCard(dataCharacter));
     });
-    pagination.textContent = `${currentPage} / ${maxPage}`;
+    pagination.textContent = `${currentPage} / ${dataCharacters.info.pages}`;
   }
 });
 
@@ -64,10 +68,24 @@ prevButton.addEventListener("click", async () => {
   } else {
     cardContainer.innerHTML = "";
     currentPage--;
-    const dataCharacters = await fetchCharacters(currentPage);
+    const dataCharacters = await fetchCharacters(currentPage, searchQuery);
     dataCharacters.results.forEach((dataCharacter) => {
       cardContainer.append(createCharacterCard(dataCharacter));
     });
-    pagination.textContent = `${currentPage} / ${maxPage}`;
+    pagination.textContent = `${currentPage} / ${dataCharacters.info.pages}`;
   }
+});
+
+searchBar.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  searchQuery = searchBarInput.value;
+  cardContainer.innerHTML = "";
+  //currentPage = "";
+  const dataCharacters = await fetchCharacters(currentPage, searchQuery);
+  dataCharacters.results.forEach((dataCharacter) => {
+    cardContainer.append(createCharacterCard(dataCharacter));
+  });
+
+  pagination.textContent = `${currentPage} / ${dataCharacters.info.pages}`;
+  console.log(dataCharacters.info.pages);
 });

@@ -17,8 +17,8 @@ const pagination = document.querySelector('[data-js="pagination"]');
 let searchQuery = "";
 let currentPage = 1;
 const dataCharacters = await fetchCharacters(currentPage, searchQuery);
-const maxPage = dataCharacters.info.pages; //hier stand eine 1
-//const page = 1;
+let maxPage = dataCharacters.info.pages; //hier stand eine 1
+const page = 1;
 
 dataCharacters.results.forEach((dataCharacter) => {
   cardContainer.append(createCharacterCard(dataCharacter));
@@ -38,7 +38,6 @@ async function fetchCharacters(pageIndex, indexQuery) {
       console.error("Response failed");
     } else {
       const data = await response.json();
-      console.log(data);
       return data; //.results
     }
   } catch (error) {
@@ -49,7 +48,9 @@ async function fetchCharacters(pageIndex, indexQuery) {
 //Next und Previous Button
 
 nextButton.addEventListener("click", async () => {
-  if (currentPage > dataCharacters.info.pages) {
+  const dataCharacters = await fetchCharacters(currentPage, searchQuery);
+  console.log(dataCharacters.info.pages);
+  if (currentPage >= dataCharacters.info.pages) {
     return;
   } else {
     cardContainer.innerHTML = "";
@@ -63,12 +64,14 @@ nextButton.addEventListener("click", async () => {
 });
 
 prevButton.addEventListener("click", async () => {
+  const dataCharacters = await fetchCharacters(currentPage, searchQuery);
+  console.log(dataCharacters.info.pages);
   if (currentPage <= 1) {
     return;
   } else {
-    cardContainer.innerHTML = "";
     currentPage--;
     const dataCharacters = await fetchCharacters(currentPage, searchQuery);
+    cardContainer.innerHTML = "";
     dataCharacters.results.forEach((dataCharacter) => {
       cardContainer.append(createCharacterCard(dataCharacter));
     });
@@ -87,5 +90,4 @@ searchBar.addEventListener("submit", async (event) => {
   });
 
   pagination.textContent = `${currentPage} / ${dataCharacters.info.pages}`;
-  console.log(dataCharacters.info.pages);
 });

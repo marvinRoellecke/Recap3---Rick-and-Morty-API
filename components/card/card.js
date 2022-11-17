@@ -23,3 +23,9 @@ export function createCharacterCard(dataCharacter) {
 
   return li;
 }
+
+export function drawCharacters(dataCharacters, cardContainer) {
+  dataCharacters.results.forEach((dataCharacter) => {
+    cardContainer.append(createCharacterCard(dataCharacter));
+  });
+}
